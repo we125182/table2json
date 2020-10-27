@@ -1,0 +1,31 @@
+{
+  "name": "table2json",
+  "version": "1.0",
+  "description": "Build an Extension!",
+  "permissions": ["activeTab", "declarativeContent", "storage"],
+  "browser_action" : {
+    "default_title" : "table2json",
+    "default_popup" : "popup.html",
+    "default_icon" : {
+      "48" : "./images/logo32.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://showdoc.ylzpay.com/*", "http://localhost:5500/*", "https://yapi.ylzpay.com/*"],
+      "css": ["table2json.css"],
+      "js": ["table2json.js"]
+    }
+  ],
+  "icons": {
+    "16": "images/logo16.png",
+    "32": "images/logo32.png",
+    "48": "images/logo64.png",
+    "128": "images/logo128.png"
+  },
+  "manifest_version": 2,
+  "background" : {
+    "scripts" : ["./popup.js"],
+    "popup" : "popup.html"
+  }
+}
