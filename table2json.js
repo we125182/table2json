@@ -1,15 +1,13 @@
-let domain = {
-    selector: 'table',
-    prop: '参数名',
-    label: '说明'
-}
+let domain = {}
 
 document.body.classList.add('table2json')
-observeDOMChange()
+chrome.storage.sync.get([location.host], function(result) {
+    domain = result[location.host]
+    observeDOMChange()
+})
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     domain = request
-    console.log(request)
     clearInsert()
     sendResponse('success')
 })
@@ -86,6 +84,10 @@ function exportButton(name, fn, scope) {
 
 function export2obj(tableEl) {
     const { labelIndex, propIndex } = formatThead(tableEl)
+    if (propIndex === -1) {
+        setTimeout(showNotification('error'), 2000)
+        return
+    }
     const rowList = formatBody(tableEl)
     const rowStrList = rowList.map(row => {
         return `  ${row[propIndex]}: '', // ${row[labelIndex]}`
@@ -98,6 +100,10 @@ function export2obj(tableEl) {
 
 function export2arr(tableEl) {
     const { labelIndex, propIndex } = formatThead(tableEl)
+    if (propIndex === -1) {
+        setTimeout(showNotification('error'), 2000)
+        return
+    }
     const rowList = formatBody(tableEl)
     const columns = rowList.map(row => {
         return {
@@ -114,12 +120,36 @@ function copy2clipboard(content) {
     if (navigator.clipboard) {
         navigator.clipboard.writeText(content)
             .then(() => {
-                // alert('已复制到剪切板');
+                setTimeout(showNotification('success'), 2000)
             })
             .catch(err => {
                 // This can happen if the user denies clipboard permissions:
                 // 如果用户没有授权，则抛出异常
                 console.error('无法复制此文本：', err);
             });
+    }
+}
+
+function showNotification(type) {
+    const typeMap = {
+        success: {
+            label: '成功',
+            value: '已复制到剪切板'
+        },
+        error: {
+            label: '错误',
+            value: `未找到 "${domain.prop}" 对应的列`
+        }
+    }
+    const wrapper = document.createElement('div')
+    wrapper.className = 'notification-wrapper'
+    const typeObj = typeMap[type]
+    wrapper.innerHTML = `
+    <div class="notification-title is-${type}">${typeObj.label}</div>
+    <div class="notification-content">${typeObj.value}</div>
+    `
+    document.body.append(wrapper)
+    return function() {
+        wrapper.remove(wrapper)
     }
 }

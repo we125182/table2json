@@ -56,13 +56,9 @@ function saveChange(e) {
     (tabs) => {
       let data = {}
       data[host] = config
-      chrome.storage.sync.set(data, function() {
-        chrome.tabs.sendMessage(tabs[0].id, { ...config }, (res) => {
-          console.log("popup=>content");
-          console.log(res);
-          window.close()
-        });
-      })
+      chrome.storage.sync.set(data)
+      chrome.tabs.sendMessage(tabs[0].id, { ...config });
+      setTimeout(window.close, 10)
     }
   );
   e.preventDefault();
