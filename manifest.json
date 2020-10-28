@@ -3,7 +3,7 @@
   "version": "1.0",
   "description": "Build an Extension!",
   "permissions": ["activeTab", "declarativeContent", "storage"],
-  "browser_action" : {
+  "page_action" : {
     "default_title" : "table2json",
     "default_popup" : "popup.html",
     "default_icon" : {
@@ -25,7 +25,6 @@
   },
   "manifest_version": 2,
   "background" : {
-    "scripts" : ["./popup.js"],
-    "popup" : "popup.html"
+    "scripts" : ["background.js"]
   }
 }

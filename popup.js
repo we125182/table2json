@@ -6,35 +6,36 @@
 
 let body = document.body;
 
-const domains = [
-  {
-    label: "selector",
-    value: "table",
-  },
-  {
-    label: "label",
-    value: "说明",
-  },
-  {
-    label: "prop",
-    value: "参数名",
-  },
-];
+const defaultConfig = {
+  selector: 'table',
+  label: '说明',
+  prop: '参数名'
+}
+let config = {};
+
+let host = ''
 
 window.onload = function () {
   const form = document.getElementById("form");
-  form.innerHTML = renderTemplate(domains);
+  chrome.tabs.getSelected(null, function (tab) {
+    host = new URL(tab.url).host
+    chrome.storage.sync.get([host], function(result) {
+      config = Object.assign({}, defaultConfig, result[host])
+      console.log(config)
+      form.innerHTML = renderTemplate(config);
+    });
+  });
   document.getElementById("submit").addEventListener("click", saveChange);
 };
 
-function renderTemplate(domains) {
-  return domains.reduce((pre, domain) => {
+function renderTemplate(config) {
+  return Object.keys(config).reduce((pre, key) => {
     return (
       pre +
       `
     <div class="form-item">
-      <label class="form-item__label">${domain.label}</label>
-      <input class="form-item__input" id="${domain.label}" value="${domain.value}">
+      <label class="form-item__label">${key}</label>
+      <input class="form-item__input" id="${key}" value="${config[key]}">
     </div>
     `
     );
@@ -44,10 +45,7 @@ function renderTemplate(domains) {
 function saveChange(e) {
   Array.from(document.getElementsByClassName("form-item__input")).forEach(
     (el) => {
-      const findIndex = domains.findIndex(
-        (domain) => domain.label === el.getAttribute("id")
-      );
-      domains[findIndex].value = el.value;
+      config[el.id] = el.value
     }
   );
   chrome.tabs.query(
@@ -56,15 +54,15 @@ function saveChange(e) {
       currentWindow: true,
     },
     (tabs) => {
-      const config = domains.reduce((pre, domain) => {
-        pre[domain.label] = domain.value
-        return pre
-      }, {})
-      chrome.tabs.sendMessage(tabs[0].id, { ...config }, (res) => {
-        console.log("popup=>content");
-        console.log(res);
-        window.close()
-      });
+      let data = {}
+      data[host] = config
+      chrome.storage.sync.set(data, function() {
+        chrome.tabs.sendMessage(tabs[0].id, { ...config }, (res) => {
+          console.log("popup=>content");
+          console.log(res);
+          window.close()
+        });
+      })
     }
   );
   e.preventDefault();
