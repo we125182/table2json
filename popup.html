@@ -11,32 +11,39 @@
       .form-item {
         position: relative;
         margin-bottom: 16px;
-      }
-      .form-item::after {
-        position: absolute;
-        content: "selector";
-        left: 1px;
-        bottom: 1px;
-        font-size: 14px;
-        padding: 3px 8px;
-        background-color: #eee;
-        border-right: 1px solid #999;
+        display: flex;
+        align-items: center;
       }
 
       .form-item__label {
-        margin-bottom: 4px;
+        width: 80px;
+        line-height: 2;
+        text-align: right;
+        padding-right: 10px;
       }
 
       .form-item__input {
-        padding: 4px 8px 4px 75px;
+        padding: 4px 8px;
         width: 100%;
         box-sizing: border-box;
         font-size: 14px;
         color: #333;
       }
+
+      .button-wrap {
+        text-align: right;
+      }
     </style>
   </head>
   <body>
+    <form>
+      <div class="form-item-list" id="form">
+
+      </div>
+      <div class="button-wrap">
+        <button class="button" type="submit" id="submit">Save</button>
+      </div>
+    </form>
     <script src="popup.js"></script>
   </body>
 </html>

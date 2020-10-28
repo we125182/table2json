@@ -1,13 +1,29 @@
-let tableSelector = 
+let domain = {
+    selector: 'table',
+    prop: '参数名',
+    label: '说明'
+}
 
-window.onload = function () {
-    document.body.classList.add('table2json')
-    observeDOMChange()
+document.body.classList.add('table2json')
+observeDOMChange()
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    domain = request
+    console.log(request)
+    clearInsert()
+    sendResponse('success')
+})
+
+function clearInsert() {
+    Array.from(document.querySelectorAll('table-target')).forEach(node => {
+        const insertNode = node.querySelector('.export-button-wrap')
+        node.remove(insertNode)
+    })
 }
 
 function observeDOMChange() {
     const observer = new MutationObserver(function(mutationList, observer) {
-        const tableElList = Array.from(document.querySelectorAll('table')).filter(node => !node.classList.contains('table-target'))
+        const tableElList = Array.from(document.querySelectorAll(domain.selector)).filter(node => !node.classList.contains('table-target'))
         if (tableElList.length) {
             tableElList.forEach(node => {
                 node.classList.add('table-target')
@@ -32,8 +48,8 @@ function formatThead(tableEl) {
     const thead = tableEl.querySelector('thead')
     const tr = thead.querySelector('tr')
     const propList = formatTr(tr)
-    const propIndex = propList.findIndex(prop => prop === '参数名')
-    const labelIndex = propList.findIndex(prop => prop === '说明')
+    const propIndex = propList.findIndex(prop => prop === domain.prop)
+    const labelIndex = propList.findIndex(prop => prop === domain.label)
     return {
         labelIndex,
         propIndex
@@ -98,7 +114,7 @@ function copy2clipboard(content) {
     if (navigator.clipboard) {
         navigator.clipboard.writeText(content)
             .then(() => {
-                alert('已复制到剪切板');
+                // alert('已复制到剪切板');
             })
             .catch(err => {
                 // This can happen if the user denies clipboard permissions:
