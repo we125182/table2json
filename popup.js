@@ -43,23 +43,33 @@ function renderTemplate(config) {
 }
 
 function saveChange(e) {
+  e.preventDefault();
+  let prop = ''
   Array.from(document.getElementsByClassName("form-item__input")).forEach(
     (el) => {
       config[el.id] = el.value
+      if (el.id === 'prop') {
+        prop = el.value
+      }
     }
   );
-  chrome.tabs.query(
-    {
-      active: true,
-      currentWindow: true,
-    },
-    (tabs) => {
-      let data = {}
-      data[host] = config
-      chrome.storage.sync.set(data)
-      chrome.tabs.sendMessage(tabs[0].id, { ...config });
-      setTimeout(window.close, 10)
-    }
-  );
-  e.preventDefault();
+  if (!prop) {
+    document.getElementById('error-tip').innerHTML = 'prop不能为空'
+    return
+  } else {
+    document.getElementById('error-tip').innerHTML = ''
+    chrome.tabs.query(
+      {
+        active: true,
+        currentWindow: true,
+      },
+      (tabs) => {
+        let data = {}
+        data[host] = config
+        chrome.storage.sync.set(data)
+        chrome.tabs.sendMessage(tabs[0].id, { ...config });
+        setTimeout(window.close, 10)
+      }
+    );
+  }
 }

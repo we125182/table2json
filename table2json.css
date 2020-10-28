@@ -106,6 +106,7 @@
 .notification-title:after {
     position: absolute;
     content: '';
+    box-sizing: content-box;
 }
 
 @keyframes slideIn {

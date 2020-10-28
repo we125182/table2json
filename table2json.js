@@ -90,7 +90,7 @@ function export2obj(tableEl) {
     }
     const rowList = formatBody(tableEl)
     const rowStrList = rowList.map(row => {
-        return `  ${row[propIndex]}: '', // ${row[labelIndex]}`
+        return row[labelIndex] ? `  ${row[propIndex]}: '', // ${row[labelIndex]}` : `  ${row[propIndex]}: '',`
     })
     rowStrList.unshift('{')
     rowStrList.push('}')
