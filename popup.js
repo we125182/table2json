@@ -19,6 +19,7 @@ window.onload = function () {
   const form = document.getElementById("form");
   chrome.tabs.getSelected(null, function (tab) {
     host = new URL(tab.url).host
+    document.getElementById('footer').innerText = host
     chrome.storage.sync.get([host], function(result) {
       config = Object.assign({}, defaultConfig, result[host])
       console.log(config)

@@ -1,51 +1,83 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <style>
-      body {
-        width: 200px;
-        font-size: 14px;
-        font-family: sans-serif;
-        color: #666;
-      }
-      .form-item {
-        position: relative;
-        margin-bottom: 16px;
-        display: flex;
-        align-items: center;
-      }
 
-      .form-item__label {
-        width: 80px;
-        line-height: 2;
-        text-align: right;
-        padding-right: 10px;
-      }
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body {
+      width: 200px;
+      font-size: 14px;
+      font-family: sans-serif;
+      color: #666;
+      margin: 0;
+      padding: 16px;
+      height: 200px;
+    }
 
-      .form-item__input {
-        padding: 4px 8px;
-        width: 100%;
-        box-sizing: border-box;
-        font-size: 14px;
-        color: #333;
-      }
+    .form-item {
+      position: relative;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+    }
 
-      .button-wrap {
-        text-align: right;
-      }
-    </style>
-  </head>
-  <body>
-    <form>
-      <div class="form-item-list" id="form">
+    .form-item__label {
+      width: 80px;
+      line-height: 2;
+      text-align: right;
+      padding-right: 10px;
+    }
 
-      </div>
-      <div class="button-wrap">
-        <span style="color: red;" id="error-tip"></span>
-        <button class="button" type="submit" id="submit">Save</button>
-      </div>
-    </form>
-    <script src="popup.js"></script>
-  </body>
+    .form-item__input {
+      padding: 4px 8px;
+      width: 100%;
+      box-sizing: border-box;
+      font-size: 14px;
+      color: #333;
+    }
+
+    .button-wrap {
+      text-align: right;
+    }
+
+    .button {
+      padding: 4px 8px;
+      background: #fff;
+      border: none;
+      color: #000;
+      border: 2px solid currentColor;
+      border-radius: 4px;
+      cursor: pointer;
+      text-align: center;
+      min-width: 80px;
+    }
+
+    .button:hover {
+      color: rgb(0, 95, 204);
+    }
+
+    .footer {
+      position: absolute;
+      bottom: 10px;
+      left: 0;
+      right: 0;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <form>
+    <div class="form-item-list" id="form">
+
+    </div>
+    <div class="button-wrap">
+      <span style="color: red;" id="error-tip"></span>
+      <input class="button" type="submit" id="submit"></button>
+    </div>
+  </form>
+  <div class="footer" id="footer">table2json@2020</div>
+  <script src="popup.js"></script>
+</body>
+
 </html>
