@@ -1,6 +1,6 @@
 let domain = {}
 
-document.body.classList.add('table2json')
+document.documentElement.classList.add('table2json')
 chrome.storage.sync.get([location.host], function(result) {
     domain = result[location.host]
     observeDOMChange()
@@ -15,7 +15,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 function clearInsert() {
     Array.from(document.querySelectorAll('table-target')).forEach(node => {
         const insertNode = node.querySelector('.export-button-wrap')
-        node.remove(insertNode)
+       insertNode.remove()
     })
 }
 
@@ -25,7 +25,7 @@ function observeDOMChange() {
         if (tableElList.length) {
             tableElList.forEach(node => {
                 node.classList.add('table-target')
-                node.parentElement.prepend(tableToolBar(node))
+                node.parentElement.insertBefore(tableToolBar(node), node)
             })
         }
     })
@@ -150,6 +150,6 @@ function showNotification(type) {
     `
     document.body.append(wrapper)
     return function() {
-        wrapper.remove(wrapper)
+        wrapper.remove()
     }
 }
