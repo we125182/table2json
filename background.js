@@ -12,6 +12,11 @@ chrome.runtime.onInstalled.addListener(function () {
       label: "说明",
       prop: "参数名"
     },
+    "192.168.11.242:4999": {
+      selector: "table",
+      label: "说明",
+      prop: "参数名"
+    },
     "yapi.ylzpay.com": {
       selector: ".ant-table",
       label: "备注",
@@ -29,6 +34,9 @@ chrome.runtime.onInstalled.addListener(function () {
         conditions: [
           new chrome.declarativeContent.PageStateMatcher({
             pageUrl: { hostEquals: "showdoc.ylzpay.com" },
+          }),
+          new chrome.declarativeContent.PageStateMatcher({
+            pageUrl: { hostEquals: "192.168.11.242:4999" },
           }),
           new chrome.declarativeContent.PageStateMatcher({
             pageUrl: { hostEquals: "yapi.ylzpay.com" },

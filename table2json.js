@@ -1,4 +1,5 @@
 let domain = {}
+let id = 1
 
 document.documentElement.classList.add('table2json')
 chrome.storage.sync.get([location.host], function(result) {
@@ -24,8 +25,11 @@ function observeDOMChange() {
         const tableElList = Array.from(document.querySelectorAll(domain.selector)).filter(node => !node.classList.contains('table-target'))
         if (tableElList.length) {
             tableElList.forEach(node => {
-                node.classList.add('table-target')
-                node.parentElement.insertBefore(tableToolBar(node), node)
+                if (!node.classList.contains('table-target')) {
+                    node.classList.add('table-target')
+                    insertRowSelection(node)
+                    node.parentElement.insertBefore(tableToolBar(node), node)
+                }
             })
         }
     })
@@ -33,6 +37,93 @@ function observeDOMChange() {
     observer.observe(document.body, {
         subtree: true, childList: true
     })
+}
+
+function tableToolBar(tableEl) {
+    const toolBar = document.createElement('div')
+    toolBar.className = 'export-button-wrap'
+    toolBar.append(exportButton('转Object', export2obj, tableEl))
+    toolBar.append(exportButton('转Array', export2arr, tableEl))
+    toolBar.append(tableID(tableEl))
+    return toolBar
+}
+
+function insertRowSelection(tableEl) {
+    const colgroup = tableEl.querySelector('colgroup')
+    const col = document.createElement('col')
+    col.setAttribute('width', '30')
+    colgroup.prepend(col)
+    const thead = tableEl.querySelector('thead')
+    const tr = thead.querySelector('tr')
+    tr.prepend(createCheckbox('th', tableEl))
+    watchTableChange(tableEl)
+}
+
+function tbodyRowSelection(tableEl) {
+    const tbody = tableEl.querySelector('tbody')
+    const trList = tbody.querySelectorAll('tr')
+    trList.forEach(item => {
+        if (!item.classList.contains('inserted-checkbox')) {
+            item.classList.add('inserted-checkbox')
+            item.prepend(createCheckbox('td'))
+        }
+    })
+}
+
+function watchTableChange(tableEl) {
+    const observer = new MutationObserver(() => {
+        tbodyRowSelection(tableEl)
+    })
+    observer.observe(tableEl, {
+        subtree: true, childList: true
+    })
+    tbodyRowSelection(tableEl)
+}
+
+function createCheckbox(tag, tableEl) {
+    const td = document.createElement(tag)
+    const input = document.createElement('input')
+    input.setAttribute('type', 'checkbox')
+    if (tableEl) {
+        const tbody = tableEl.querySelector('tbody')
+        input.addEventListener('change', (e) => {
+            const checkList = tbody.querySelectorAll('input[type=checkbox]')
+            checkList.forEach(check => check.checked = e.target.checked)
+        })
+    }
+    td.appendChild(input)
+    return td
+}
+
+function tableID(tableEl) {
+    const tableId = calcId()
+    tableEl.setAttribute('id', tableId)
+    const button = document.createElement('button')
+    button.classList.add('export-button')
+    button.innerHTML = '复制: ' + tableId
+    button.onclick = function () {
+        copy2clipboard(tableId)
+    }
+    return button
+}
+
+function calcId() {
+    const sort = 'NO' + id.toString().padStart(2, '0')
+    id++
+    if (id > 100) {
+        id = 1
+    }
+    return sort
+}
+
+function exportButton(name, fn, scope) {
+    const button = document.createElement('button')
+    button.classList.add('export-button')
+    button.innerText = name
+    button.onclick = function () {
+        fn(scope)
+    }
+    return button
 }
 
 function formatTr(trEl) {
@@ -55,31 +146,15 @@ function formatThead(tableEl) {
 }
 
 function formatBody(tableEl) {
-    const thead = tableEl.querySelector('tbody')
-    const trList = thead.querySelectorAll('tr')
     const rowList = []
-    trList.forEach(tr => {
-        rowList.push(formatTr(tr))
+    const tbody = tableEl.querySelector('tbody')
+    const checkboxList = tbody.querySelectorAll('input[type=checkbox]')
+    checkboxList.forEach(item => {
+        if (item.checked) {
+            rowList.push(formatTr(item.parentElement.parentElement))
+        }
     })
     return rowList
-}
-
-function tableToolBar(tableEl) {
-    const toolBar = document.createElement('div')
-    toolBar.className = 'export-button-wrap'
-    toolBar.append(exportButton('转Object', export2obj, tableEl))
-    toolBar.append(exportButton('转Array', export2arr, tableEl))
-    return toolBar
-}
-
-function exportButton(name, fn, scope) {
-    const button = document.createElement('button')
-    button.classList.add('export-button')
-    button.innerText = name
-    button.onclick = function () {
-        fn(scope)
-    }
-    return button
 }
 
 function export2obj(tableEl) {
