@@ -59,25 +59,27 @@ function insertRowSelection(tableEl) {
     watchTableChange(tableEl)
 }
 
-function tbodyRowSelection(tableEl) {
+function tbodyRowSelection(tableEl, observer) {
+    observer.disconnect()
     const tbody = tableEl.querySelector('tbody')
     const trList = tbody.querySelectorAll('tr')
     trList.forEach(item => {
-        if (!item.classList.contains('inserted-checkbox')) {
-            item.classList.add('inserted-checkbox')
+        if (!item.getAttribute('inserted-checkbox')) {
+            item.setAttribute('inserted-checkbox', true)
             item.prepend(createCheckbox('td'))
         }
+    })
+    observer.observe(tableEl, {
+        childList: true,
+        subtree: true
     })
 }
 
 function watchTableChange(tableEl) {
-    const observer = new MutationObserver(() => {
-        tbodyRowSelection(tableEl)
+    const observer = new MutationObserver((mutationList, observer) => {
+        tbodyRowSelection(tableEl, observer)
     })
-    observer.observe(tableEl, {
-        subtree: true, childList: true
-    })
-    tbodyRowSelection(tableEl)
+    tbodyRowSelection(tableEl, observer)
 }
 
 function createCheckbox(tag, tableEl) {
